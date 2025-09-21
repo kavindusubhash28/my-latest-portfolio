@@ -1,76 +1,53 @@
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-});
+// Highlight active link on scroll
+const sections = document.querySelectorAll("section");
+const navLinks = document.querySelectorAll(".nav-links a");
 
-// Intersection Observer for scroll animations
-const animateOnScroll = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        // Add animation classes when element is in view
-        if (entry.isIntersecting) {
-            if (entry.target.classList.contains('project-card')) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            } else if (entry.target.classList.contains('info-box')) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        }
-    });
-});
+window.addEventListener("scroll", () => {
+  let current = "";
 
-// Apply initial styles and observe elements
-document.querySelectorAll('.project-card, .info-box').forEach(element => {
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(20px)';
-    element.style.transition = 'all 0.6s ease-out';
-    animateOnScroll.observe(element);
-});
-
-// Navbar scroll behavior
-const navbar = document.querySelector('.navbar');
-let lastScroll = 0;
-
-window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-
-    // Add/remove shadow based on scroll position
-    if (currentScroll > 0) {
-        navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-    } else {
-        navbar.style.boxShadow = 'none';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 70;
+    if (pageYOffset >= sectionTop) {
+      current = section.getAttribute("id");
     }
+  });
 
-    lastScroll = currentScroll;
+  navLinks.forEach(link => {
+    link.classList.remove("active");
+    if (link.getAttribute("href").slice(1) === current) {
+      link.classList.add("active");
+    }
+  });
 });
 
-// Mobile menu toggle (if needed for smaller screens)
-function createMobileMenu() {
-    const navbar = document.querySelector('.navbar');
-    const navLinks = document.querySelector('.nav-links');
-    
-    // Create hamburger button
-    const hamburger = document.createElement('button');
-    hamburger.classList.add('mobile-menu-btn');
-    hamburger.innerHTML = '<i class="fas fa-bars"></i>';
-    
-    // Add to navbar only on mobile
-    if (window.innerWidth <= 768) {
-        navbar.appendChild(hamburger);
-        navLinks.classList.add('mobile-nav');
-    }
-    
-    // Toggle menu
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('show');
-    });
-}
+// About section tabs
+document.addEventListener('DOMContentLoaded', () => {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
 
-// Initialize mobile menu
-window.addEventListener('load', createMobileMenu);
-window.addEventListener('resize', createMobileMenu);
+  function switchTab(tabId) {
+    // Remove active class from all buttons and panes
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabPanes.forEach(pane => pane.classList.remove('active'));
+
+    // Add active class to clicked button and corresponding pane
+    const activeButton = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    const activePane = document.getElementById(tabId);
+    
+    if (activeButton && activePane) {
+      activeButton.classList.add('active');
+      activePane.classList.add('active');
+    }
+  }
+
+  // Add click event listeners to tab buttons
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const tabId = button.getAttribute('data-tab');
+      switchTab(tabId);
+    });
+  });
+
+  // Set initial active tab
+  switchTab('education');
+});
